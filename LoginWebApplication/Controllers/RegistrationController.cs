@@ -11,6 +11,8 @@ using System.Net.Http;
 using System.Net;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using Microsoft.AspNetCore.Mvc;
+using LoginWebApplication.Operations;
 
 namespace LoginWebApplication.Controllers
 {
@@ -26,19 +28,34 @@ namespace LoginWebApplication.Controllers
         }
 
         [HttpPost, Route("api/register")]
-        public IHttpActionResult CreateUser(Person person)
+        public ActionResult<string> CreateUser(User user)
         {
-            Person p = new Person();
+            /*
+            User p = new User();
             p.FirstName = "Chelsey";
             p.LastName = "Coughlin";
             p.Email = "chelsey74@live.ca";
             p.Password = "1234";
-            CreatePerson(p);
-            return Ok();
-        }
+            */
 
-        //[HttpPost, Route("api/password")]
-        public Person SaltAndHash(Person person)
+            //User user = p;
+            ValidateUser validate = new ValidateUser();
+            UserOperations userOps = new UserOperations();
+
+            if (validate.ValidateUserEmail(user) && !validate.ValidateEmailNotRegistered(user) && !validate.ValidateUserIsNotEmpty(user))
+            {
+                user = userOps.SaltAndHash(user);
+                user.Id = Guid.NewGuid();
+                userOps.CreateUser(user);
+                return "User created successfully.";
+            }
+            else
+            {
+                return "User not created successfully";
+            }
+        }
+        /*
+        public User SaltAndHash(User user)
         {
             byte[] salt = new byte[128 / 8];
             using (var rngCsp = new RNGCryptoServiceProvider())
@@ -47,35 +64,16 @@ namespace LoginWebApplication.Controllers
             }
 
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: person.Password,
+                password: user.Password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA512,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
-            person.Password = hashed;
+            user.Password = hashed;
 
-            return person;
+            return user;
         }
-
-        public IHttpActionResult CreatePerson(Person person)
-        {
-            Person user = person;
-            ValidateUser validate = new ValidateUser();
-            Operations.UserOperations userOps = new Operations.UserOperations();
-
-            if (validate.ValidateUserEmail(user) && !validate.ValidateEmailNotRegistered(user) && !validate.ValidateUserIsNotEmpty(user))
-            {
-               user = SaltAndHash(person);
-               user.Id = Guid.NewGuid();
-               userOps.CreateUser(user);
-
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+         */
     }
 }

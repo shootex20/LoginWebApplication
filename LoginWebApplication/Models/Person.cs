@@ -2,7 +2,7 @@ using System;
 
 namespace LoginWebApplication
 {
-    public class Person
+    public class User
     {
         public string FirstName { get; set; }
 

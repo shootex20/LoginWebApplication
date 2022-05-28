@@ -14,19 +14,19 @@ namespace LoginWebApplication
 
         //private string connString = ConfigurationManager.AppSettings["sqlConnection"];
 
-        private string connString = @"server=127.0.0.1;userid=root;password=password;database=buyselldb";
+        private string connString = @"server=127.0.0.1;userid=root;password=4tsb?~8K_3~zcVn9cNU]Q4.@;database=buyselldb";
 
-        public bool ValidateUserEmail(Person person)
+        public bool ValidateUserEmail(User user)
         {
             string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            return regex.IsMatch(person.Email);
+            return regex.IsMatch(user.Email);
         }
-        public bool ValidateEmailNotRegistered(Person person) {
+        public bool ValidateEmailNotRegistered(User user) {
             var con = new MySqlConnection(connString);
             var cmd = new MySqlCommand("SELECT COUNT(*) FROM users WHERE email = @email", con);
             con.Open();
-            cmd.Parameters.AddWithValue("@email", person.Email);
+            cmd.Parameters.AddWithValue("@email", user.Email);
             cmd.Prepare();
             Int64 UserExist = (Int64) cmd.ExecuteScalar();
             if (UserExist > 0)
@@ -40,9 +40,9 @@ namespace LoginWebApplication
             }
         }
 
-        public bool ValidateUserIsNotEmpty(Person person) {
+        public bool ValidateUserIsNotEmpty(User user) {
 
-            if (person.FirstName != null && person.LastName != null && person.Id != null && person.Email != null && person.Password != null)
+            if (user.FirstName != null && user.LastName != null && user.Id != null && user.Email != null && user.Password != null)
             {
                 return false;
             }
